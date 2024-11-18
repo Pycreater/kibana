@@ -19,11 +19,17 @@ export interface FindRulesResponse {
   data: Rule[];
 }
 
-export const getMutedAlerts = async (
-  http: HttpStart,
-  params: { ruleIds: string[] },
-  signal?: AbortSignal
-) => {
+export interface GetRulesWithMutedAlertsParams {
+  ruleIds: string[];
+  http: HttpStart;
+  signal?: AbortSignal;
+}
+
+export const getRulesWithMutedAlerts = async ({
+  http,
+  ruleIds,
+  signal,
+}: GetRulesWithMutedAlertsParams) => {
   const filterNode = nodeBuilder.or(
     params.ruleIds.map((id) => nodeBuilder.is('alert.id', `alert:${id}`))
   );
@@ -32,7 +38,7 @@ export const getMutedAlerts = async (
       filter: JSON.stringify(filterNode),
       fields: ['id', 'mutedInstanceIds'],
       page: 1,
-      per_page: params.ruleIds.length,
+      per_page: ruleIds.length,
     }),
     signal,
   });
